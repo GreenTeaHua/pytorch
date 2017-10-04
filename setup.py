@@ -462,6 +462,7 @@ main_sources = [
     "torch/csrc/autograd/functions/onnx/basic_ops.cpp",
     "torch/csrc/onnx/onnx.pb.cpp",
     "torch/csrc/onnx/onnx.cpp",
+    "torch/csrc/cuda/AutoGPU.cpp",
 ]
 main_sources += split_types("torch/csrc/Tensor.cpp")
 
@@ -522,7 +523,6 @@ if WITH_CUDA:
         "torch/csrc/cuda/Module.cpp",
         "torch/csrc/cuda/Storage.cpp",
         "torch/csrc/cuda/Stream.cpp",
-        "torch/csrc/cuda/AutoGPU.cpp",
         "torch/csrc/cuda/utils.cpp",
         "torch/csrc/cuda/expand_utils.cpp",
         "torch/csrc/cuda/serialization.cpp",
