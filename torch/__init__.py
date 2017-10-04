@@ -34,14 +34,11 @@ try:
 except:
     pass
 
+old_flags = None
+
 if platform.system() == 'Windows':
     import os
     os.environ['PATH'] = os.path.dirname(__file__) + '\\lib\\;' + os.environ['PATH']
-
-    from torch._C import *
-    __all__ += [name for name in dir(_C)
-                if name[0] != '_' and
-                not name.endswith('Base')]
 
 else:
     # Loading the extension with RTLD_GLOBAL option allows to not link extension
@@ -61,15 +58,17 @@ else:
     old_flags = sys.getdlopenflags()
     sys.setdlopenflags(_dl_flags.RTLD_GLOBAL | _dl_flags.RTLD_NOW)
 
-    from torch._C import *
-
-    __all__ += [name for name in dir(_C)
-                if name[0] != '_' and
-                not name.endswith('Base')]
-
-    sys.setdlopenflags(old_flags)
     del _dl_flags
     del old_flags
+
+from torch._C import *
+
+__all__ += [name for name in dir(_C)
+            if name[0] != '_' and
+            not name.endswith('Base')]
+
+if platform.system() != 'Windows':
+    sys.setdlopenflags(old_flags)
 
 ################################################################################
 # Define basic utilities

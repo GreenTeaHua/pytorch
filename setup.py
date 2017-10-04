@@ -212,6 +212,8 @@ def monkey_patch_THD_link_flags():
 class build_ext(setuptools.command.build_ext.build_ext):
 
     def run(self):
+        global _C_LIB
+
         # Print build options
         if WITH_NUMPY:
             print('-- Building with NumPy bindings')
@@ -269,6 +271,16 @@ class build_ext(setuptools.command.build_ext.build_ext):
             'torch/lib/build/ATen/ATen/Declarations.yaml',
             autograd_gen_dir)
 
+        if IS_WINDOWS:
+            build_temp = self.build_temp
+            build_dir = 'torch/csrc'
+
+            ext_filename = self.get_ext_filename('_C')
+            lib_filename = '.'.join(ext_filename.split('.')[:-1]) + '.lib'
+
+            _C_LIB = os.path.join(build_temp, build_dir, lib_filename).replace('\\', '/')
+            print(_C_LIB)
+
         # It's an old-style class in Python 2.7...
         setuptools.command.build_ext.build_ext.run(self)
 
@@ -322,10 +334,6 @@ else:
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 lib_path = os.path.join(cwd, "torch", "lib")
-
-# Debug option for Windows
-if IS_WINDOWS:
-    extra_link_args.append('/DEBUG:FULL')
 
 
 # Check if you remembered to check out submodules
@@ -386,9 +394,6 @@ if IS_WINDOWS:
     THCUNN_LIB = os.path.join(lib_path, 'THCUNN.lib')
     THPP_LIB = os.path.join(lib_path, 'THPP.lib')
     ATEN_LIB = os.path.join(lib_path, 'ATen.lib')
-    _C_LIB = 'build/temp.win-amd64-' + str(sys.version_info[0]) + '.' + str(
-        sys.version_info[1]) + '/Release/torch/csrc/_C.cp' + str(
-            sys.version_info[0]) + str(sys.version_info[1]) + '-win_amd64.lib'
     NANOPB_STATIC_LIB = os.path.join(lib_path, 'protobuf-nanopb.lib')
 
 main_compile_args = ['-D_THP_CORE']
@@ -548,8 +553,11 @@ if WITH_CUDNN:
     extra_compile_args += ['-DWITH_CUDNN']
 
 if DEBUG:
-    extra_compile_args += ['-O0', '-g']
-    extra_link_args += ['-O0', '-g']
+    if IS_WINDOWS:
+        extra_link_args.append('/DEBUG:FULL')
+    else:
+        extra_compile_args += ['-O0', '-g']
+        extra_link_args += ['-O0', '-g']
 
 if os.getenv('PYTORCH_BINARY_BUILD') and platform.system() == 'Linux':
     print('PYTORCH_BINARY_BUILD found. Static linking libstdc++ on Linux')

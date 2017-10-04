@@ -9,11 +9,20 @@ LINUX_HOME = '/usr/local/cuda'
 WINDOWS_HOME = 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v8.0'
 
 
-def find_nvcc():
-    proc = Popen(['which', 'nvcc'], stdout=PIPE, stderr=PIPE)
+def find_nvcc(osname):
+    if osname != 'Windows':
+        proc = Popen(['which', 'nvcc'], stdout=PIPE, stderr=PIPE)
+    else:
+        proc = Popen(['where', 'nvcc.exe'], stdout=PIPE, stderr=PIPE)
     out, err = proc.communicate()
     out = out.decode().strip()
     if len(out) > 0:
+        if osname == 'Windows':
+            if out.find('\r\n') != -1:
+                out = out.split('\r\n')[0]
+            out = os.path.abspath(os.path.join(os.path.dirname(out), ".."))
+            out = out.replace('\\', '/')
+            out = str(out)
         return os.path.dirname(out)
     else:
         return None
@@ -30,8 +39,8 @@ else:
         CUDA_HOME = os.getenv('CUDA_PATH', WINDOWS_HOME).replace('\\', '/')
     if not os.path.exists(CUDA_HOME):
         # We use nvcc path on Linux and cudart path on macOS
-        if osname == 'Linux':
-            cuda_path = find_nvcc()
+        if osname == 'Linux' or osname == 'Windows':
+            cuda_path = find_nvcc(osname)
         else:
             cudart_path = ctypes.util.find_library('cudart')
             if cudart_path is not None:

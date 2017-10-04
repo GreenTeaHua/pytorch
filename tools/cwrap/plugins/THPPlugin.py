@@ -37,7 +37,7 @@ class THPPlugin(CWrapPlugin):
         'THStride*': Template('__stride.get()'),
         'void*': Template('THPUtils_unpackLong($arg)'),
         'long': Template('THPUtils_unpackLong($arg)'),
-        'int': Template('(int) THPUtils_unpackLong($arg)'),
+        'int': Template('((int) THPUtils_unpackLong($arg))'),
         'int64_t': Template('THPUtils_unpackLong($arg)'),
         'bool': Template('($arg == Py_True ? true : false)'),
         'float': Template('THPFloatUtils_unpackReal($arg)'),

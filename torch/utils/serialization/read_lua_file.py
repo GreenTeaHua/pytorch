@@ -42,7 +42,6 @@ TYPE_RECUR_FUNCTION = 8
 LEGACY_TYPE_RECUR_FUNCTION = 7
 
 
-import sys
 import struct
 from array import array
 from collections import namedtuple
@@ -57,8 +56,6 @@ from torch._utils import _import_dotted_name
 HAS_CUDA = torch.cuda.is_available()
 
 LuaFunction = namedtuple('LuaFunction', ['size', 'dumped', 'upvalues'])
-
-LONGLONG_TYPECODE = 'q' if sys.version[0] == '3' else 'l'
 
 
 class hashable_uniq_dict(dict):
@@ -478,9 +475,9 @@ class T7Reader:
 
     def read_long(self):
         if self.long_size is None:
-            return self._read(LONGLONG_TYPECODE)
+            return self._read('l')
         elif self.long_size is 8:
-            return self._read(LONGLONG_TYPECODE)
+            return self._read('q')
         else:
             return self._read('i')
 
@@ -491,7 +488,7 @@ class T7Reader:
                 lst.append(self.read_long())
             return lst
         else:
-            arr = array(LONGLONG_TYPECODE)
+            arr = array('q')
             arr.fromfile(self.f, n)
             return arr.tolist()
 

@@ -34,6 +34,12 @@ struct python_error : public std::exception {
     Py_XINCREF(traceback);
   }
 
+  python_error(python_error&& other) {
+    type = std::move(other.type)
+    value = std::move(other.value)
+    traceback = std::move(other.traceback)
+  }
+
   ~python_error() {
     if (type || value || traceback) {
       AutoGIL gil;
