@@ -24,13 +24,13 @@ else:
                 NVTOOLEXT_HOME = None
         if NVTOOLEXT_HOME is None:
             from _winreg import ConnectRegistry, OpenKey, QueryValueEx
-           
+
             reg = ConnectRegistry(None, HKEY_LOCAL_MACHINE)
 
             try:
                 # query in the registry for the path of NvToolsExt: %NVTOOLEXT%\lib\x64\nvToolsExt64_1.lib
-                lib_path_key = OpenKey(aReg,
-                                       r"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Components\2221AD5AF46D01746B10434547D0B4F7")
+                lib_path_key = OpenKey(aReg, r"""SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData\
+                                       S-1-5-18\Components\2221AD5AF46D01746B10434547D0B4F7""")
                 lib_path = QueryValueEx(aKey, "88F2D65B5688DF047BCA0F47EED402D1")[0]
             except WindowsError:
                 NVTOOLEXT_HOME = None

@@ -333,11 +333,11 @@ class TestCase(unittest.TestCase):
                     ("I got this output for {}:\n\n{}\n\n"
                      "No expect file exists; to accept the current output, run:\n"
                      "python {} {} --accept").format(munged_id, s, __main__.__file__, munged_id))
-        
+
         if sys.platform == 'win32':
-            expected = re.sub(r'CppOp\[(\w+)\]', 'CppOp[]', expected)
-            s = re.sub(r'CppOp\[(\w+)\]', 'CppOp[]', s)
-        
+            expected = re.sub(r'CppOp\[(.+?)\]', 'CppOp[]', expected)
+            s = re.sub(r'CppOp\[(.+?)\]', 'CppOp[]', s)
+
         if ACCEPT:
             if expected != s:
                 return accept_output("updated output")

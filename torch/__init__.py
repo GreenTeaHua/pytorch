@@ -59,7 +59,6 @@ else:
     sys.setdlopenflags(_dl_flags.RTLD_GLOBAL | _dl_flags.RTLD_NOW)
 
     del _dl_flags
-    del old_flags
 
 from torch._C import *
 
@@ -69,6 +68,7 @@ __all__ += [name for name in dir(_C)
 
 if platform.system() != 'Windows':
     sys.setdlopenflags(old_flags)
+    del old_flags
 
 ################################################################################
 # Define basic utilities
