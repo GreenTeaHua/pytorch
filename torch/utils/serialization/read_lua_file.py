@@ -42,6 +42,7 @@ TYPE_RECUR_FUNCTION = 8
 LEGACY_TYPE_RECUR_FUNCTION = 7
 
 
+import sys
 import struct
 from array import array
 from collections import namedtuple
