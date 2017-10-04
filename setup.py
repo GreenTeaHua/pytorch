@@ -212,7 +212,7 @@ def monkey_patch_THD_link_flags():
 class build_ext(setuptools.command.build_ext.build_ext):
 
     def run(self):
-        global _C_LIB
+        global _C_LIB, THNN, THCUNN
 
         # Print build options
         if WITH_NUMPY:
@@ -279,7 +279,10 @@ class build_ext(setuptools.command.build_ext.build_ext):
             lib_filename = '.'.join(ext_filename.split('.')[:-1]) + '.lib'
 
             _C_LIB = os.path.join(build_temp, build_dir, lib_filename).replace('\\', '/')
-            print(_C_LIB)
+
+            THNN.extra_link_args += [_C_LIB]
+            if WITH_CUDA:
+                THCUNN.extra_link_args += [_C_LIB]
 
         # It's an old-style class in Python 2.7...
         setuptools.command.build_ext.build_ext.run(self)
@@ -370,7 +373,6 @@ THCUNN_LIB = os.path.join(lib_path, 'libTHCUNN.so.1')
 ATEN_LIB = os.path.join(lib_path, 'libATen.so.1')
 THD_LIB = os.path.join(lib_path, 'libTHD.a')
 NCCL_LIB = os.path.join(lib_path, 'libnccl.so.1')
-_C_LIB = None
 
 # static library only
 NANOPB_STATIC_LIB = os.path.join(lib_path, 'libprotobuf-nanopb.a')
@@ -615,7 +617,7 @@ THNN = Extension("torch._thnn._THNN",
                      TH_LIB,
                      THNN_LIB,
                      make_relative_rpath('../lib'),
-                 ] + [_C_LIB] if _C_LIB is not None else []
+                 ]
                  )
 extensions.append(THNN)
 
@@ -630,7 +632,7 @@ if WITH_CUDA:
                            THC_LIB,
                            THCUNN_LIB,
                            make_relative_rpath('../lib'),
-                       ] + [_C_LIB] if _C_LIB is not None else []
+                       ]
                        )
     extensions.append(THCUNN)
 

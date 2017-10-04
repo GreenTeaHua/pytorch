@@ -814,7 +814,7 @@ static PyObject * THPTensor_stateless_(cat)(THPTensor *_unused, PyObject *args, 
   THPTensorPtr result;
   Py_ssize_t len;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|lO", argnames, &_seq, &dim, &___out)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|iO", argnames, &_seq, &dim, &___out)) {
     goto invalid_arguments;
   }
 
