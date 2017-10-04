@@ -488,7 +488,8 @@ class T7Reader:
                 lst.append(self.read_long())
             return lst
         else:
-            arr = array('q')
+            LONG_SIZE_ARR = 'q' if sys.version_info[0] == 3 else 'l'
+            arr = array(LONG_SIZE_ARR)
             arr.fromfile(self.f, n)
             return arr.tolist()
 
