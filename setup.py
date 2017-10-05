@@ -16,6 +16,7 @@ from tools.setup_helpers.env import check_env_flag
 from tools.setup_helpers.cuda import WITH_CUDA, CUDA_HOME
 from tools.setup_helpers.cudnn import WITH_CUDNN, CUDNN_LIB_DIR, CUDNN_INCLUDE_DIR
 from tools.setup_helpers.nccl import WITH_NCCL, WITH_SYSTEM_NCCL, NCCL_LIB_DIR, NCCL_INCLUDE_DIR, NCCL_ROOT_DIR
+from tools.setup_helpers.nnpack import WITH_NNPACK, NNPACK_LIB_DIR, NNPACK_INCLUDE_DIRS
 from tools.setup_helpers.nvtoolext import NVTOOLEXT_HOME
 from tools.setup_helpers.split_types import split_types
 
@@ -239,6 +240,12 @@ class build_ext(setuptools.command.build_ext.build_ext):
             monkey_patch_THD_link_flags()
         else:
             print('-- Building without distributed package')
+
+        # Do we actually need this here?
+        if WITH_NNPACK:
+            print('-- Detected NNPACK at ' + NNPACK_LIB_DIR)
+        else:
+            print('-- Not using NNPACK')
 
         # cwrap depends on pyyaml, so we can't import it earlier
         from tools.cwrap import cwrap
@@ -541,7 +548,8 @@ if WITH_NCCL:
 
 if WITH_CUDNN:
     main_libraries += ['cudnn']
-    include_dirs.append(CUDNN_INCLUDE_DIR)
+    # NOTE: this this at the front, in case there's another cuDNN in CUDA path
+    include_dirs.insert(0, CUDNN_INCLUDE_DIR)
     library_dirs.append(CUDNN_LIB_DIR)
     main_sources += [
         "torch/csrc/cudnn/BatchNorm.cpp",
@@ -553,6 +561,15 @@ if WITH_CUDNN:
         "torch/csrc/cudnn/Handles.cpp",
     ]
     extra_compile_args += ['-DWITH_CUDNN']
+
+if WITH_NNPACK:
+    main_libraries += ['nnpack', 'pthreadpool']
+    include_dirs.extend(NNPACK_INCLUDE_DIRS)
+    library_dirs.append(NNPACK_LIB_DIR)
+    main_sources += [
+        "torch/csrc/nnpack/NNPACK.cpp",
+    ]
+    extra_compile_args += ['-DWITH_NNPACK']
 
 if DEBUG:
     if IS_WINDOWS:
