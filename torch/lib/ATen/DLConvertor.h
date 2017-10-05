@@ -10,7 +10,7 @@
 
 namespace at {
 
-DLTensor* toDLPack(const Tensor& src, DLTensor* dlTensor);
-Tensor fromDLPack(const DLTensor* src);
+ATen_CLASS DLTensor* toDLPack(const Tensor& src, DLTensor* dlTensor);
+ATen_CLASS fromDLPack(const DLTensor* src);
 
 } //namespace at
